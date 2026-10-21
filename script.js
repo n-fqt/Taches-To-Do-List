@@ -1,15 +1,25 @@
 let tasks = [];
 let selectedTaskId = null;
+let editingTaskId = null;
 
 const taskContainer = document.getElementById("task-container");
 const sidebar = document.getElementById("sidebar");
 const toggleBtn = document.getElementById("toggle-btn");
 const modal = document.getElementById("task-modal");
+const modalTitle = document.getElementById("modal-title");
 const btnNewTask = document.getElementById("btn-new-task");
 const btnCancel = document.getElementById("btn-cancel");
 const btnCreate = document.getElementById("btn-create");
 const btnChangeColor = document.getElementById("btn-change-color");
 const progressFill = document.getElementById("progress-fill");
+const btnImportant = document.getElementById("btn-important");
+const importantModal = document.getElementById("important-modal");
+const importantList = document.getElementById("important-list");
+const btnCloseImportant = document.getElementById("btn-close-important");
+const btnEditTask = document.getElementById("btn-edit-task");
+const editSelectModal = document.getElementById("edit-select-modal");
+const editList = document.getElementById("edit-list");
+const btnCloseEditSelect = document.getElementById("btn-close-edit-select");
 
 toggleBtn.addEventListener("click", () => {
   sidebar.classList.toggle("collapsed");
@@ -17,7 +27,18 @@ toggleBtn.addEventListener("click", () => {
   toggleBtn.textContent = sidebar.classList.contains("collapsed") ? "←" : "→";
 });
 
+function clearModalInputs() {
+  document.getElementById("task-title-input").value = "";
+  document.getElementById("task-desc-input").value = "";
+  document.getElementById("task-date-input").value = "";
+  document.getElementById("task-color-input").value = "#8ca1d4";
+}
+
 btnNewTask.addEventListener("click", () => {
+  editingTaskId = null;
+  clearModalInputs();
+  modalTitle.textContent = "Créer une nouvelle tâche";
+  btnCreate.textContent = "Créer";
   modal.classList.add("active");
   document.getElementById("task-title-input").focus();
 });
@@ -38,29 +59,33 @@ btnCreate.addEventListener("click", () => {
     return;
   }
 
-  const newTask = {
-    id: Date.now().toString(),
-    title: title,
-    desc: desc,
-    date: date,
-    color: color,
-    completed: false,
-  };
+  if (editingTaskId) {
+    const task = tasks.find((t) => t.id === editingTaskId);
+    if (task) {
+      task.title = title;
+      task.desc = desc;
+      task.date = date;
+      task.color = color;
+    }
+  } else {
+    const newTask = {
+      id: Date.now().toString(),
+      title: title,
+      desc: desc,
+      date: date,
+      color: color,
+      completed: false,
+      important: false,
+    };
+    tasks.push(newTask);
+  }
 
-  tasks.push(newTask);
   renderTasks();
   updateProgress();
-
   modal.classList.remove("active");
   clearModalInputs();
+  editingTaskId = null;
 });
-
-function clearModalInputs() {
-  document.getElementById("task-title-input").value = "";
-  document.getElementById("task-desc-input").value = "";
-  document.getElementById("task-date-input").value = "";
-  document.getElementById("task-color-input").value = "#8ca1d4";
-}
 
 function renderTasks() {
   taskContainer.innerHTML = "";
@@ -77,16 +102,19 @@ function renderTasks() {
         e.target.type === "checkbox"
       )
         return;
-
       document
         .querySelectorAll(".task-card")
         .forEach((c) => (c.style.boxShadow = "0 4px 15px rgba(0,0,0,0.1)"));
-
       selectedTaskId = task.id;
       card.style.boxShadow = "0 0 20px 5px " + task.color;
     });
 
+    const importantBadge = task.important
+      ? `<div class="important-badge">⚠️ Important</div>`
+      : "";
+
     card.innerHTML = `
+            ${importantBadge}
             <button class="delete-btn" onclick="deleteTask('${task.id}')">X</button>
             <div class="task-title">${task.title}</div>
             <div class="task-desc">${task.desc}</div>
@@ -96,7 +124,6 @@ function renderTasks() {
                 <span style="font-size:0.8rem">Fait</span>
             </div>
         `;
-
     taskContainer.appendChild(card);
   });
 }
@@ -142,13 +169,83 @@ btnChangeColor.addEventListener("click", () => {
       renderTasks();
       const cards = document.querySelectorAll(".task-card");
       cards.forEach((c) => {
-        if (c.innerHTML.includes(task.title)) {
+        if (c.innerHTML.includes(task.title))
           c.style.boxShadow = "0 0 20px 5px " + task.color;
-        }
       });
     }
   });
 });
+
+btnImportant.addEventListener("click", () => {
+  importantList.innerHTML = "";
+  if (tasks.length === 0) {
+    importantList.innerHTML =
+      '<p style="text-align:center; color:#aaa;">Aucune tâche.</p>';
+  } else {
+    tasks.forEach((task) => {
+      const item = document.createElement("div");
+      item.className = "important-item";
+      item.innerHTML = `<span>${task.title}</span>${task.important ? '<span class="status-text">Déjà important</span>' : ""}`;
+      item.onclick = () => makeImportant(task.id);
+      importantList.appendChild(item);
+    });
+  }
+  importantModal.classList.add("active");
+});
+
+btnCloseImportant.addEventListener("click", () => {
+  importantModal.classList.remove("active");
+});
+
+window.makeImportant = (id) => {
+  const index = tasks.findIndex((t) => t.id === id);
+  if (index !== -1) {
+    const task = tasks.splice(index, 1)[0];
+    task.important = true;
+    tasks.unshift(task);
+    renderTasks();
+    importantModal.classList.remove("active");
+  }
+};
+
+btnEditTask.addEventListener("click", () => {
+  editList.innerHTML = "";
+  if (tasks.length === 0) {
+    editList.innerHTML =
+      '<p style="text-align:center; color:#aaa;">Aucune tâche à modifier.</p>';
+  } else {
+    tasks.forEach((task) => {
+      const item = document.createElement("div");
+      item.className = "important-item";
+      item.innerHTML = `<span>${task.title}</span><span style="font-size:0.8rem; color:#aaa;">✏️ Modifier</span>`;
+      item.onclick = () => openEditModal(task.id);
+      editList.appendChild(item);
+    });
+  }
+  editSelectModal.classList.add("active");
+});
+
+btnCloseEditSelect.addEventListener("click", () => {
+  editSelectModal.classList.remove("active");
+});
+
+window.openEditModal = (id) => {
+  const task = tasks.find((t) => t.id === id);
+  if (!task) return;
+
+  editingTaskId = id;
+
+  document.getElementById("task-title-input").value = task.title;
+  document.getElementById("task-desc-input").value = task.desc;
+  document.getElementById("task-date-input").value = task.date;
+  document.getElementById("task-color-input").value = task.color;
+
+  modalTitle.textContent = "Modifier la tâche";
+  btnCreate.textContent = "Enregistrer";
+
+  editSelectModal.classList.remove("active");
+  modal.classList.add("active");
+};
 
 function hexToRgba(hex, alpha) {
   const r = parseInt(hex.slice(1, 3), 16),
@@ -156,57 +253,6 @@ function hexToRgba(hex, alpha) {
     b = parseInt(hex.slice(5, 7), 16);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
-
-tasks = [
-  {
-    id: "1",
-    title: "Tâches #1",
-    desc: "Description de la tâche 1",
-    date: "",
-    color: "#8ca1d4",
-    completed: false,
-  },
-  {
-    id: "2",
-    title: "Tâches #2",
-    desc: "Description de la tâche 2",
-    date: "",
-    color: "#c38ce4",
-    completed: false,
-  },
-  {
-    id: "3",
-    title: "Tâches #3",
-    desc: "Description de la tâche 3",
-    date: "",
-    color: "#8cc4e4",
-    completed: false,
-  },
-  {
-    id: "4",
-    title: "Tâches #4",
-    desc: "Description de la tâche 4",
-    date: "",
-    color: "#8ca1d4",
-    completed: false,
-  },
-  {
-    id: "5",
-    title: "Tâches #5",
-    desc: "Description de la tâche 5",
-    date: "",
-    color: "#8ce4d4",
-    completed: false,
-  },
-  {
-    id: "6",
-    title: "Tâches #6",
-    desc: "Description de la tâche 6",
-    date: "",
-    color: "#4cdbcc",
-    completed: false,
-  },
-];
 
 renderTasks();
 updateProgress();

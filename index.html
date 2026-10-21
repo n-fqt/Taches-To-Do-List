@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mes Tâches - To-Do List</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
     <div class="main-container" id="task-container">
@@ -16,13 +14,11 @@
     <button class="toggle-btn" id="toggle-btn">→</button>
 
     <div class="sidebar" id="sidebar">
-        <button class="toggle-btn" id="toggle-btn">→</button>
-
         <h2>Menu</h2>
         <button class="menu-btn" id="btn-new-task">Nouvelle tâche</button>
         <button class="menu-btn" id="btn-change-color">Couleur (Tâche sél.)</button>
-        <button class="menu-btn">Option 1</button>
-        <button class="menu-btn">Option 2</button>
+        <button class="menu-btn" id="btn-important">Important</button>
+        <button class="menu-btn" id="btn-edit-task">Modifier une tâche</button>
 
         <div class="progress-container">
             <p>Tâches à finir</p>
@@ -34,8 +30,8 @@
 
     <div class="modal-overlay" id="task-modal">
         <div class="modal-content">
-            <h3>Créer une nouvelle tâche</h3>
-
+            <h3 id="modal-title">Créer une nouvelle tâche</h3>
+            
             <div class="input-group">
                 <label>Titre de la tâche</label>
                 <input type="text" id="task-title-input" placeholder="Ex: Faire les courses">
@@ -63,7 +59,30 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="important-modal">
+        <div class="modal-content">
+            <h3>Marquer comme Important</h3>
+            <p style="text-align:center; margin-bottom: 15px; font-size: 0.9em; color: #ccc;">
+                Clique sur une tâche pour la remonter en premier.
+            </p>
+            <div class="important-list" id="important-list"></div>
+            <div class="modal-actions" style="justify-content: center;">
+                <button class="btn-cancel" id="btn-close-important">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="edit-select-modal">
+        <div class="modal-content">
+            <h3>Choisir une tâche à modifier</h3>
+            <div class="important-list" id="edit-list">
+            </div>
+            <div class="modal-actions" style="justify-content: center;">
+                <button class="btn-cancel" id="btn-close-edit-select">Fermer</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
-
 </html>
