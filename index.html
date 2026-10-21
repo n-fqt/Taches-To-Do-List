@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Tâches - To-Do List</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="main-container" id="task-container">
+    </div>
+
+    <button class="toggle-btn" id="toggle-btn">→</button>
+
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-btn" id="toggle-btn">→</button>
+
+        <h2>Menu</h2>
+        <button class="menu-btn" id="btn-new-task">Nouvelle tâche</button>
+        <button class="menu-btn" id="btn-change-color">Couleur (Tâche sél.)</button>
+        <button class="menu-btn">Option 1</button>
+        <button class="menu-btn">Option 2</button>
+
+        <div class="progress-container">
+            <p>Tâches à finir</p>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="task-modal">
+        <div class="modal-content">
+            <h3>Créer une nouvelle tâche</h3>
+
+            <div class="input-group">
+                <label>Titre de la tâche</label>
+                <input type="text" id="task-title-input" placeholder="Ex: Faire les courses">
+            </div>
+
+            <div class="input-group">
+                <label>Description</label>
+                <textarea id="task-desc-input" rows="3" placeholder="Détails de la tâche..."></textarea>
+            </div>
+
+            <div class="input-group">
+                <label>Date (optionnel)</label>
+                <input type="date" id="task-date-input">
+            </div>
+
+            <div class="input-group">
+                <label>Couleur de la carte</label>
+                <input type="color" id="task-color-input" value="#8ca1d4">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" id="btn-cancel">Annuler</button>
+                <button class="btn-create" id="btn-create">Créer</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
